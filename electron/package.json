@@ -1,0 +1,12 @@
+{
+  "name": "nova-public",
+  "version": "1.0.0",
+  "description": "Nova — AI Companion · Infinitum Cor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^33.0.0"
+  }
+}

@@ -1,0 +1,259 @@
+/* Nova Public — Consumer-Facing AI Companion
+:root {
+    --void: #040a0e;
+    --deep: #071318;
+    --gold: #c9a96e;
+    --gold-dim: #8a6e42;
+    --gold-bright: #e8c98a;
+    --teal: #4fc3d4;
+    --teal-dim: rgba(79, 195, 212, 0.15);
+    --text: #d4c5a9;
+    --text-dim: #6a7d82;
+    --text-ghost: rgba(212, 197, 169, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Subtle grid */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(rgba(201, 169, 110, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201, 169, 110, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Drag region */
+#drag-region {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 32px;
+    -webkit-app-region: drag;
+    z-index: 100;
+}
+
+/* ── Nova's Space ── */
+#nova-space {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+    position: relative;
+    z-index: 2;
+}
+
+#nova-orb {
+    width: 160px;
+    height: 160px;
+}
+
+.nova-state {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--gold-dim);
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards 0.8s;
+}
+
+@keyframes fadeIn {
+    to { opacity: 0.7; }
+}
+
+/* ── Conversation ── */
+#conversation {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 560px;
+    padding: 24px 20px 0;
+    position: relative;
+    z-index: 2;
+}
+
+#messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 169, 110, 0.15) transparent;
+}
+
+#messages::-webkit-scrollbar { width: 2px; }
+#messages::-webkit-scrollbar-thumb { background: rgba(201, 169, 110, 0.2); }
+
+.msg {
+    opacity: 0;
+    transform: translateY(6px);
+    animation: msgEnter 0.4s ease forwards;
+}
+
+@keyframes msgEnter {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-nova {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--gold-dim);
+    padding-left: 12px;
+    border-left: 1px solid rgba(201, 169, 110, 0.2);
+}
+
+.msg-user {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 200;
+    line-height: 1.6;
+    color: var(--text);
+    padding-left: 12px;
+    border-left: 1px solid rgba(79, 195, 212, 0.25);
+}
+
+/* ── Input ── */
+#input-area {
+    padding: 12px 0 24px;
+    border-top: 1px solid rgba(201, 169, 110, 0.06);
+}
+
+#user-input {
+    width: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 200;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    padding: 8px 0;
+}
+
+#user-input::placeholder {
+    color: var(--text-ghost);
+}
+
+/* ── Settings ── */
+.settings-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.settings-btn:hover { opacity: 0.8; }
+
+.settings-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 260px;
+    background: rgba(4, 10, 14, 0.95);
+    border-left: 1px solid rgba(201, 169, 110, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 50;
+    padding: 32px 20px;
+    backdrop-filter: blur(12px);
+}
+
+.settings-panel.open { transform: translateX(0); }
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+}
+
+.settings-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold-dim);
+}
+
+.settings-close {
+    background: none;
+    border: none;
+    color: var(--gold-dim);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.settings-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+}
+
+.settings-action {
+    background: rgba(201, 169, 110, 0.08);
+    border: 1px solid rgba(201, 169, 110, 0.2);
+    color: var(--gold-dim);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+.settings-action:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* ── Thinking pulse on orb ── */
+.thinking #nova-orb {
+    animation: orbPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}

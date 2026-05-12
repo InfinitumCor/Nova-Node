@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@100;200;300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Drag region for frameless window -->
+    <div id="drag-region"></div>
+
+    <!-- Nova's presence -->
+    <div id="nova-space">
+        <canvas id="nova-orb"></canvas>
+        <div id="nova-state" class="nova-state">I'm here.</div>
+    </div>
+
+    <!-- Conversation -->
+    <div id="conversation">
+        <div id="messages"></div>
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="" autocomplete="off" spellcheck="false">
+        </div>
+    </div>
+
+    <!-- Settings toggle -->
+    <button id="btn-settings" class="settings-btn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="16" height="16">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09"/>
+        </svg>
+    </button>
+
+    <!-- Settings panel -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-header">
+            <span class="settings-title">Settings</span>
+            <button id="settings-close" class="settings-close">&times;</button>
+        </div>
+        <div class="settings-row">
+            <span class="settings-label">Clear History</span>
+            <button id="btn-clear" class="settings-action">Clear</button>
+        </div>
+    </div>
+
+    <script src="nova.js"></script>
+</body>
+</html>
