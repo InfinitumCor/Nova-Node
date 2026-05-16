@@ -1,0 +1,390 @@
+# Nova
+
+A local voice companion built around a single principle: **silence is the default.**
+
+Nova doesn't speak unless spoken to. She has presence, an emotional model that observes itself, response modes you can switch into mid-conversation, and a quiet ritual layer for shared silence and deep listening.
+
+Everything runs locally except the language model call. Speech-to-text, wake-word detection, and text-to-speech playback all happen on your machine.
+
+This is the open-source release. Base capability only.
+
+— Infinitum Cor LLC
+
+---
+
+## What you're installing
+
+```
+Wake Word  →  Speech-to-text  →  LLM (Claude)  →  Text-to-speech
+(Porcupine    (local Whisper)    (Anthropic API)   (Edge-TTS, free)
+ or STUB)
+```
+
+You need:
+- Python on your computer
+- Git on your computer
+- An Anthropic API key (paid, but cheap for personal use)
+- About 15 minutes if you're technical, 45 minutes if you're new to this
+
+Nova's voice uses the free Microsoft Edge-TTS service by default — no account or signup required. If you want premium voice quality, ElevenLabs is supported as an optional upgrade (see the Configuration section).
+
+---
+
+## Quickstart (for technical users)
+
+If you're comfortable with terminals, virtual environments, and editing config files:
+
+```bash
+git clone <repo-url>
+cd nova-public
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env              # then edit .env with your key
+python nova.py
+```
+
+**Required in `.env`:** `ANTHROPIC_API_KEY`
+
+If you don't have a Picovoice key, Nova runs in STUB mode — press ENTER to wake instead of speaking.
+
+Done. Skip to the **Configuration** section below.
+
+---
+
+## Walkthrough (for everyone else)
+
+If you've never used a terminal before, or you're not sure what a virtual environment is, follow this section. It's longer, but every step is explicit. The end result is the same.
+
+### Step 1 — Install Python
+
+Nova needs Python 3.10 or newer.
+
+**macOS:**
+1. Open Terminal (press Cmd+Space, type "Terminal", press Enter)
+2. Check if Python is already installed by typing: `python3 --version`
+3. If you see "Python 3.10" or higher, skip to Step 2
+4. If not, install Homebrew first by visiting https://brew.sh and following their one-line install
+5. Then install Python: `brew install python@3.11`
+
+**Windows:**
+1. Go to https://www.python.org/downloads/
+2. Download the latest Python installer (3.11 or newer)
+3. Run the installer
+4. **IMPORTANT:** Check the box that says "Add Python to PATH" on the first screen of the installer. If you miss this, Nova will not work.
+5. Click "Install Now"
+6. Open Command Prompt (press Windows key, type "cmd", press Enter)
+7. Verify: type `python --version`. You should see "Python 3.11" or similar.
+
+**Linux:**
+1. Open your terminal
+2. Most distros come with Python already. Check: `python3 --version`
+3. If you need to install it on Ubuntu/Debian: `sudo apt update && sudo apt install python3 python3-pip python3-venv`
+4. On Fedora: `sudo dnf install python3 python3-pip`
+5. On Arch: `sudo pacman -S python python-pip`
+
+### Step 2 — Install Git
+
+Git is how you'll download Nova's code.
+
+**macOS:**
+Type `git --version` in Terminal. If Git is installed, you'll see a version number. If not, macOS will prompt you to install the developer tools — accept that prompt.
+
+**Windows:**
+1. Go to https://git-scm.com/download/win
+2. Download and run the installer
+3. Accept all default options unless you have a reason not to
+4. Open Command Prompt and verify: `git --version`
+
+**Linux:**
+- Ubuntu/Debian: `sudo apt install git`
+- Fedora: `sudo dnf install git`
+- Arch: `sudo pacman -S git`
+
+### Step 3 — Download Nova
+
+Open your terminal (Command Prompt on Windows, Terminal on macOS/Linux) and navigate to where you want Nova to live. A good default is your home folder.
+
+```bash
+cd ~
+git clone <repo-url>
+cd nova-public
+```
+
+On Windows, replace `~` with `%USERPROFILE%` or just use the path to your user folder.
+
+You now have a folder called `nova-public` with all of Nova's code inside it.
+
+### Step 4 — Create a virtual environment
+
+A virtual environment is a sandboxed Python install just for Nova. It keeps Nova's dependencies from conflicting with other Python projects on your system.
+
+From inside the `nova-public` folder:
+
+```bash
+python -m venv venv
+```
+
+On some macOS systems, you'll need to use `python3` instead of `python`.
+
+After the command finishes, activate the environment:
+
+**macOS/Linux:**
+```bash
+source venv/bin/activate
+```
+
+**Windows (Command Prompt):**
+```bash
+venv\Scripts\activate
+```
+
+**Windows (PowerShell):**
+```bash
+venv\Scripts\Activate.ps1
+```
+
+If activation worked, your terminal prompt should now show `(venv)` at the start of the line. You'll need to activate the environment every time you open a new terminal to run Nova.
+
+### Step 5 — Install Nova's dependencies
+
+With the virtual environment active:
+
+```bash
+pip install -r requirements.txt
+```
+
+This will take a few minutes. It downloads everything Nova needs — Whisper for speech-to-text, audio libraries, the Anthropic SDK, Edge-TTS, and a handful of other packages.
+
+If you see errors mentioning `PyAudio`, you may need system-level audio libraries:
+
+- **macOS:** `brew install portaudio` then re-run pip install
+- **Linux (Ubuntu/Debian):** `sudo apt install portaudio19-dev python3-pyaudio` then re-run
+- **Windows:** Usually works without extra steps. If it fails, try `pip install pipwin && pipwin install pyaudio`
+
+### Step 6 — Get your API key
+
+Nova needs one API key to function, plus one optional one for wake-word detection.
+
+**Anthropic (required — Nova's brain):**
+1. Go to https://console.anthropic.com/settings/keys
+2. Sign in or create an account
+3. Click "Create Key", give it a name like "Nova"
+4. Copy the key. You'll only see it once. Save it somewhere private.
+5. You'll need to add billing — Nova's typical usage is a few dollars a month for moderate personal use
+
+**Picovoice (optional — wake-word detection):**
+1. Go to https://picovoice.ai
+2. Sign up for a free personal account
+3. Get an access key from the console
+4. Without this, Nova runs in STUB mode — you press ENTER to wake her instead of saying her name
+
+Nova's voice uses free Microsoft Edge-TTS by default — nothing to sign up for. If you'd rather use ElevenLabs for premium voice quality, see the Configuration section below.
+
+### Step 7 — Configure Nova
+
+Copy the environment template:
+
+**macOS/Linux:**
+```bash
+cp .env.example .env
+```
+
+**Windows:**
+```bash
+copy .env.example .env
+```
+
+Open the new `.env` file in any text editor (TextEdit on macOS, Notepad on Windows, nano or your editor of choice on Linux). Fill in at minimum:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+If you have a Picovoice key, add it too. Otherwise leave it blank and Nova will run in STUB mode.
+
+### Step 8 — Run Nova
+
+```bash
+python nova.py
+```
+
+If everything is configured correctly, Nova will start up. In wake-word mode, say her name. In STUB mode, press ENTER. Speak, and she responds.
+
+To stop Nova, press Ctrl+C in the terminal.
+
+---
+
+## Configuration
+
+All tunables live in `config.py`. The most useful settings:
+
+- **Wake word** — defaults to "Nova". Configurable in `config.py` and Picovoice console
+- **Voice mode** — Edge-TTS (free Microsoft voices) is the default. To upgrade to ElevenLabs, add `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` to `.env`. If either is missing, Nova falls back to Edge-TTS automatically
+- **Silence boundaries** — Nova's unprompted-speech gaps and quiet-hours are set in `pipeline/autonomy.py`. Default: 20-minute minimum gap between unprompted utterances, no unprompted speech between 1 AM and 6 AM
+- **Response modes** — Switch mid-conversation: say "deep mode", "brief mode", "socratic mode", "devil's advocate", "focus mode", "creative mode", or "conversational mode"
+- **Ritual states** — Trigger silence with "sit with me", "silence", "presence only". Trigger deep listening with "hold space", "just listen", "witness this". Exit either with "thank you"
+
+### Optional: ElevenLabs for premium voice
+
+If you want higher voice quality than Edge-TTS:
+
+1. Sign up at https://elevenlabs.io. The free tier gives you 10,000 characters per month
+2. From your ElevenLabs profile, copy your API key
+3. List the voices available to you:
+
+   ```bash
+   python -c "from elevenlabs.client import ElevenLabs; c = ElevenLabs(api_key='YOUR_KEY'); [print(v.voice_id, v.name) for v in c.voices.get_all().voices]"
+   ```
+
+   Replace `YOUR_KEY` with your actual ElevenLabs API key.
+
+4. Add both values to `.env`:
+
+   ```
+   ELEVENLABS_API_KEY=...
+   ELEVENLABS_VOICE_ID=...
+   ```
+
+If either is missing or invalid, Nova quietly falls back to Edge-TTS — she'll still speak.
+
+---
+
+## Architecture
+
+```
+nova-public/
+├── nova.py                       # Main entry point — wake/STT/turn loop
+├── nova_curiosity.py             # Delta-driven autonomous-thought engine
+├── nova_websocket.py             # Loopback HUD bridge (ws://127.0.0.1:8765)
+├── config.py                     # All tunables, system prompt, paths
+├── requirements.txt
+├── .env.example
+│
+├── pipeline/
+│   ├── brain.py                  # System prompt assembly + Claude call
+│   ├── modes.py                  # 7 response modes
+│   ├── register.py               # Auto-detect operational/reflective/creative
+│   ├── autonomy.py               # Boundaries: silence-by-default, night, gaps
+│   ├── presence.py               # "Step away" mode — Nova journals silently
+│   ├── nova_rituals.py           # Silence Mode + Deep Listening
+│   ├── speech_gate.py            # Central allow/deny for unprompted speech
+│   ├── emotional_state.py        # 6-state blend
+│   ├── emotion_state.py          # 11-register text/voice carry-forward
+│   ├── emotion_witness.py        # Read-only meta-observer
+│   ├── delta_detector.py         # Polls registered grounding sources
+│   ├── delta_classifier.py       # Significance gate
+│   └── security/
+│       └── gates.py              # PBKDF2 passphrase + HMAC challenge
+│
+├── memory/
+│   ├── session.py
+│   ├── longterm.py
+│   └── patterns.py
+│
+└── initiation/
+    ├── engine.py
+    ├── selectors.py
+    ├── memory_interface.py
+    ├── contextual.py
+    ├── config/initiation_config.json
+    └── pools/
+        ├── idle.json             # ← Empty. Add your own light questions.
+        └── reflective.json       # ← Empty. Add your own deeper prompts.
+```
+
+---
+
+## Core ideas
+
+**The voice loop is silent by default.** From `pipeline/autonomy.py`:
+
+> Nova speaks unprompted only when CURIOSITY, DISCOVERY, or INTELLIGENCE fires. NULL is the default. Silence is valued.
+
+**The Witness never writes.** `pipeline/emotion_witness.py` watches emotional state over time and emits pattern observations. It is strictly read-only. If the witness could modify state, Nova's self-observation would change what she's observing.
+
+**Three layers of affect.** A continuous activation blend drives color and voice profile. A discrete register tracks frustrated, focused, playful, reflective, and other states. The witness sits above both as observer.
+
+**Two ritual states.** Silence Mode stops generation entirely. Deep Listening holds space and only responds to direct questions.
+
+**Presence Mode.** When you step away, Nova keeps thinking and writes those thoughts to a daily journal at `nova_data/presence_log/YYYY-MM-DD-presence.md`. When you return, she can briefly mention what she was on.
+
+**Speech Gate.** Every unprompted speech source asks the gate before voicing. Default policy is deny. Every decision is audited.
+
+**Truthfulness directive.** From Nova's system prompt:
+
+> You DO NOT make up names, appointments, emails, attachments, or any other plausible-sounding content. Ever. The single worst failure mode is fabricating a plausible answer when asked about specific data.
+
+---
+
+## Optional HUD
+
+Nova hosts a WebSocket bridge on `ws://127.0.0.1:8765` (loopback only). Connect a desktop UI to it to see live state, transcripts, and emotion snapshots. The protocol is documented at the top of `nova_websocket.py`.
+
+The repository ships an `electron/` folder containing a minimal orb UI from a prior consumer-app prototype. It is not wired to the Python pipeline — it's a standalone Electron app. Ignore it, replace it, or remove it depending on your direction.
+
+---
+
+## Extending
+
+**Add a curiosity source:**
+```python
+pipeline.delta_detector.register_source(name, snapshot_fn, diff_fn)
+```
+Provide a callable that returns a current snapshot dict, and one that diffs prev/cur into delta records.
+
+**Tune the curiosity classifier:**
+```python
+pipeline.delta_classifier.register_heuristic(source, fn)
+```
+Return a verdict dict or None to defer to the LLM.
+
+**Lift the speech gate:**
+Edit `ALLOW_SOURCES` in `pipeline/speech_gate.py`, or call `speech_gate.allow("source_name")` at runtime, to permit unprompted output from a given source.
+
+**Add initiation questions:**
+Drop entries into `initiation/pools/idle.json` or `initiation/pools/reflective.json`. Format:
+```json
+{"id": "idle_001", "text": "What's something you're enjoying lately?", "weight": "light"}
+```
+
+---
+
+## Troubleshooting
+
+**Nova starts but I can't hear her.**
+Check your default audio output device. On macOS, run `system_profiler SPAudioDataType` to see what's selected. On Windows, right-click the speaker icon and verify the right output is the default. On Linux, check `pavucontrol` or your equivalent.
+
+**Nova doesn't hear me.**
+Check your microphone permissions. Your OS may be blocking terminal apps from accessing the mic.
+- **macOS:** System Settings → Privacy & Security → Microphone → enable for Terminal (or whichever terminal you're using)
+- **Windows:** Settings → Privacy & Security → Microphone → enable for desktop apps
+- **Linux:** Verify your input device is set in your audio control panel and not muted
+
+**`ModuleNotFoundError` when running `python nova.py`.**
+Your virtual environment isn't active. Look at your terminal prompt — you should see `(venv)` at the start. If not, run the activate command for your OS again from Step 4.
+
+**`pyaudio` install fails.**
+You're missing system-level audio libraries. See the note in Step 5.
+
+**Wake word never fires.**
+If you don't have a Picovoice key, you're in STUB mode by design — press ENTER to wake Nova. If you do have a key, verify it's in `.env` and that your microphone is working.
+
+**Nova talks too much, or talks at the wrong time.**
+She shouldn't, by design. If you're seeing this, check `nova_data/gate_log/` for the audit trail — every unprompted speech decision is logged there. If something is firing that shouldn't, edit `pipeline/speech_gate.py`.
+
+**Anthropic API errors.**
+Verify your key is correct and that your account has billing enabled. Personal usage is typically a few dollars a month; without billing, the key won't work.
+
+**Nova hallucinates details about your day or your data.**
+She shouldn't. The system prompt explicitly forbids it. If you see this, file an issue — it's a real bug, not a behavior to expect.
+
+---
+
+## License
+
+To be added. Treat as all-rights-reserved until then.
+
+Infinitum Cor LLC
+
+We Are Inevitable.
