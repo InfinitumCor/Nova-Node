@@ -1,0 +1,7 @@
+[
+  {
+    "_comment": "Idle pool — light, low-pressure conversational questions.",
+    "_comment_2": "Public release ships with an empty pool. Populate this file with question objects in the form: {\"id\": \"idle_001\", \"text\": \"What's something you're enjoying lately?\", \"weight\": \"light\"}",
+    "_comment_3": "Once you add real entries, REMOVE this placeholder object."
+  }
+]

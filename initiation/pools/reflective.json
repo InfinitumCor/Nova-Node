@@ -1,0 +1,7 @@
+[
+  {
+    "_comment": "Reflective pool — deeper, contemplative prompts.",
+    "_comment_2": "Public release ships with an empty pool. Populate this file with question objects in the form: {\"id\": \"reflective_001\", \"text\": \"How are you actually doing right now? Not the surface answer.\", \"weight\": \"medium\"}",
+    "_comment_3": "Once you add real entries, REMOVE this placeholder object."
+  }
+]

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+venv/
+.env
+nova_data/
+nova.sh
+nova.ps1

@@ -1,0 +1,30 @@
+# Nova — Python Requirements
+# Voice-enabled AI companion: Wake Word -> STT -> LLM -> TTS
+
+# ── LLM ──
+anthropic>=0.39.0        # optional — only if LLM_PROVIDER=anthropic
+
+# ── Voice: TTS ──
+elevenlabs>=1.50.0
+edge-tts>=6.1.0           # Free fallback TTS
+sounddevice>=0.4.6
+soundfile>=0.12.1
+pydub>=0.25.1
+
+# ── Voice: STT ──
+openai-whisper>=20240930  # Local Whisper for speech-to-text
+silero-vad>=5.1           # Voice Activity Detection
+
+# ── Wake Word (optional) ──
+# Picovoice/Porcupine is the production path. Without an access key,
+# Nova falls back to STUB mode (press ENTER to wake) — see nova.py.
+pvporcupine>=3.0.2
+
+# ── Core Utilities ──
+python-dotenv>=1.0.0
+numpy>=1.26.0
+requests>=2.31.0
+websockets>=12.0          # Optional desktop HUD bridge
+
+# ── Standard-Library-Adjacent ──
+# zoneinfo is stdlib on Python 3.9+; no extra package needed.
